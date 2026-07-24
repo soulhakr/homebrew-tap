@@ -15,5 +15,5 @@ cask "pi" do
   desc "Minimal terminal coding agent harness"
   homepage "https://pi.dev"
 
-  binary "pi"
+  binary "pi/pi"  # extracted tarball has a pi/ subdirectory containing the binary
 end
