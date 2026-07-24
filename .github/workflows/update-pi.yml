@@ -1,4 +1,4 @@
-name: Update Pi Formula
+name: Update Pi Cask
 
 on:
   schedule:
@@ -19,14 +19,14 @@ jobs:
           RELEASE=$(curl -s "https://api.github.com/repos/earendil-works/pi/releases/latest")
           LATEST_TAG=$(echo "$RELEASE" | jq -r '.tag_name')
           LATEST_VERSION="${LATEST_TAG#v}"
-          CURRENT_VERSION=$(grep -oP '(?<=version ")[\d.]+' Formula/pi.rb | head -1)
+          CURRENT_VERSION=$(grep -oP '(?<=version ")[\d.]+' Casks/pi.rb | head -1)
 
           echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
           echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
           if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
             echo "update_needed=true" >> $GITHUB_OUTPUT
-            echo "New version found: $LATEST_VERSION (current: $CURRENT_VERSION)"
+            echo "New version: $LATEST_VERSION (current: $CURRENT_VERSION)"
           else
             echo "update_needed=false" >> $GITHUB_OUTPUT
             echo "Already at $CURRENT_VERSION, nothing to do."
@@ -43,7 +43,7 @@ jobs:
           echo "arm64_sha=$ARM64_SHA" >> $GITHUB_OUTPUT
           echo "x64_sha=$X64_SHA" >> $GITHUB_OUTPUT
 
-      - name: Update Formula/pi.rb
+      - name: Update Casks/pi.rb
         if: steps.release.outputs.update_needed == 'true'
         env:
           VERSION: ${{ steps.release.outputs.latest }}
@@ -57,13 +57,13 @@ jobs:
           arm64_sha = os.environ["ARM64_SHA"]
           x64_sha   = os.environ["X64_SHA"]
 
-          with open("Formula/pi.rb") as f:
+          with open("Casks/pi.rb") as f:
               content = f.read()
 
-          # Update version line
+          # Update version
           content = re.sub(r'version "[\d.]+"', f'version "{version}"', content)
 
-          # Replace sha256 keyed by the surrounding URL suffix for precision
+          # Update sha256 values keyed by arch suffix for precision
           content = re.sub(
               r'(pi-darwin-arm64\.tar\.gz"\n\s+sha256 ")[0-9a-f]{64}',
               lambda m: m.group(1) + arm64_sha,
@@ -75,10 +75,10 @@ jobs:
               content
           )
 
-          with open("Formula/pi.rb", "w") as f:
+          with open("Casks/pi.rb", "w") as f:
               f.write(content)
 
-          print(open("Formula/pi.rb").read())
+          print(open("Casks/pi.rb").read())
           PYEOF
 
       - name: Commit and push
@@ -86,6 +86,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/pi.rb
-          git commit -m "Update pi formula to ${{ steps.release.outputs.latest }}"
+          git add Casks/pi.rb
+          git commit -m "Update pi cask to ${{ steps.release.outputs.latest }}"
           git push
