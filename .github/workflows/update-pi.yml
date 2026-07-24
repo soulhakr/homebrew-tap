@@ -1,0 +1,91 @@
+name: Update Pi Formula
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # daily at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for new release
+        id: release
+        run: |
+          RELEASE=$(curl -s "https://api.github.com/repos/earendil-works/pi/releases/latest")
+          LATEST_TAG=$(echo "$RELEASE" | jq -r '.tag_name')
+          LATEST_VERSION="${LATEST_TAG#v}"
+          CURRENT_VERSION=$(grep -oP '(?<=version ")[\d.]+' Formula/pi.rb | head -1)
+
+          echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "update_needed=true" >> $GITHUB_OUTPUT
+            echo "New version found: $LATEST_VERSION (current: $CURRENT_VERSION)"
+          else
+            echo "update_needed=false" >> $GITHUB_OUTPUT
+            echo "Already at $CURRENT_VERSION, nothing to do."
+          fi
+
+      - name: Fetch SHA256 checksums
+        if: steps.release.outputs.update_needed == 'true'
+        id: sha
+        run: |
+          VERSION="${{ steps.release.outputs.latest }}"
+          SUMS=$(curl -sL "https://github.com/earendil-works/pi/releases/download/v${VERSION}/SHA256SUMS")
+          ARM64_SHA=$(echo "$SUMS" | grep 'pi-darwin-arm64' | awk '{print $1}')
+          X64_SHA=$(echo "$SUMS" | grep 'pi-darwin-x64' | awk '{print $1}')
+          echo "arm64_sha=$ARM64_SHA" >> $GITHUB_OUTPUT
+          echo "x64_sha=$X64_SHA" >> $GITHUB_OUTPUT
+
+      - name: Update Formula/pi.rb
+        if: steps.release.outputs.update_needed == 'true'
+        env:
+          VERSION: ${{ steps.release.outputs.latest }}
+          ARM64_SHA: ${{ steps.sha.outputs.arm64_sha }}
+          X64_SHA: ${{ steps.sha.outputs.x64_sha }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, re
+
+          version   = os.environ["VERSION"]
+          arm64_sha = os.environ["ARM64_SHA"]
+          x64_sha   = os.environ["X64_SHA"]
+
+          with open("Formula/pi.rb") as f:
+              content = f.read()
+
+          # Update version line
+          content = re.sub(r'version "[\d.]+"', f'version "{version}"', content)
+
+          # Replace sha256 keyed by the surrounding URL suffix for precision
+          content = re.sub(
+              r'(pi-darwin-arm64\.tar\.gz"\n\s+sha256 ")[0-9a-f]{64}',
+              lambda m: m.group(1) + arm64_sha,
+              content
+          )
+          content = re.sub(
+              r'(pi-darwin-x64\.tar\.gz"\n\s+sha256 ")[0-9a-f]{64}',
+              lambda m: m.group(1) + x64_sha,
+              content
+          )
+
+          with open("Formula/pi.rb", "w") as f:
+              f.write(content)
+
+          print(open("Formula/pi.rb").read())
+          PYEOF
+
+      - name: Commit and push
+        if: steps.release.outputs.update_needed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/pi.rb
+          git commit -m "Update pi formula to ${{ steps.release.outputs.latest }}"
+          git push
