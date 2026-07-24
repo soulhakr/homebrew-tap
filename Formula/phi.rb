@@ -1,6 +1,4 @@
 class Phi < Formula
-  include Language::Python::Virtualenv
-
   desc "An inspectable Agent Harness, built from scratch in Python"
   homepage "https://singularitycoding.github.io/phi/"
   url "https://github.com/SingularityCoding/phi/archive/d5cdd334232e6c18c863f33aa283b026cbef442c.tar.gz"
@@ -10,10 +8,15 @@ class Phi < Formula
   head "https://github.com/SingularityCoding/phi.git", branch: "main"
 
   depends_on "python@3.12"
+  depends_on "uv"
 
   def install
-    venv = virtualenv_create(libexec, "python3.12")
-    system "#{libexec}/bin/pip", "install", "--no-cache-dir", buildpath.to_s
+    # uv handles the uv_build backend natively — no separate pip step needed
+    system Formula["uv"].opt_bin/"uv", "venv", "--python=python3.12", libexec.to_s
+    system Formula["uv"].opt_bin/"uv", "pip", "install",
+           "--python=#{libexec}/bin/python3",
+           "--no-cache-dir",
+           buildpath.to_s
     bin.install_symlink "#{libexec}/bin/phi"
   end
 
