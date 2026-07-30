@@ -40,14 +40,6 @@ brew install --cask soulhakr/tap/purr
 brew install soulhakr/tap/phi
 ```
 
-### omniroute
-
-[OmniRoute](https://omniroute.online) — free AI gateway (diegosouzapw/OmniRoute). One OpenAI-compatible endpoint routing across 290+ providers (90+ free) with auto-fallback, RTK+Caveman token compression (15–95% savings), and a web dashboard. Requires Node.js.
-
-```bash
-brew install soulhakr/tap/omniroute
-```
-
 ---
 
 ## Auto-update workflows
@@ -58,7 +50,6 @@ All packages are kept current by GitHub Actions workflows that run daily at 06:0
 |---|---|---|
 | `update-pi.yml` | `earendil-works/pi` GitHub releases | `Casks/pi.rb` version + arch SHA256s |
 | `update-phi.yml` | `SingularityCoding/phi` `pyproject.toml` version on `main` | `Formula/phi.rb` commit SHA + version |
-| `update-omniroute.yml` | `omniroute` on npm | `Formula/omniroute.rb` version + tarball SHA256 |
 | `update-purr.yml` | `iamarunbrahma/purr` GitHub releases | `Casks/purr.rb` version + SHA256 |
 
 Workflows can also be triggered manually from the [Actions tab](https://github.com/soulhakr/homebrew-tap/actions).
