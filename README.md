@@ -53,12 +53,3 @@ All packages are kept current by GitHub Actions workflows that run daily at 06:0
 | `update-purr.yml` | `iamarunbrahma/purr` GitHub releases | `Casks/purr.rb` version + SHA256 |
 
 Workflows can also be triggered manually from the [Actions tab](https://github.com/soulhakr/homebrew-tap/actions).
-
----
-
-## Not in this tap
-
-The following tools are installed from this tap's `brew tap soulhakr/tap` but live in homebrew-core or homebrew-cask — no custom recipe needed:
-
-- **hermes-agent** → `brew install hermes-agent` (homebrew-core)
-- **t3-code** → `brew install --cask t3-code` (homebrew-cask)
