@@ -1,14 +1,14 @@
 cask "pi" do
-  version "0.86.1"
+  version "0.87.0"
 
   on_arm do
     url "https://github.com/earendil-works/pi/releases/download/v#{version}/pi-darwin-arm64.tar.gz"
-    sha256 "03bd097ad4540ae4c3d9c1b5b19c517047cda0f1506bfcb992b17308460b0383"
+    sha256 "fd0409795d03f89ad5d57a772f3a45cc23373e0e24148cd44a08d78109f6093e"
   end
 
   on_intel do
     url "https://github.com/earendil-works/pi/releases/download/v#{version}/pi-darwin-x64.tar.gz"
-    sha256 "74b0262948651f70c6d85a52043985e8fce2c89f1cd3a6f08f81d9cc799ec4a4"
+    sha256 "cd5bd2df345e4f22eee59098d52046420d2c7829687adb1932f65eace7a54852"
   end
 
   name "Pi"
