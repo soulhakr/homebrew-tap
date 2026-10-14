@@ -40,6 +40,15 @@ brew install --cask soulhakr/tap/purr
 brew install soulhakr/tap/phi
 ```
 
+### foks-tts
+
+[FOKS TTS](https://github.com/soulhakr/foks-tts) — a macOS menu bar app that reads a window, a dragged area, the whole screen or selected text aloud in a natural offline voice (Kokoro-82M on MLX), highlighting each word as it is spoken. Requires Apple silicon and macOS 14+. It builds from source (needs the Command Line Tools) and downloads about 800 MB (Python packages with pinned hashes, plus the model, checked against a SHA-256).
+
+```bash
+brew install soulhakr/tap/foks-tts
+foks-tts-setup        # copies FOKS TTS.app into ~/Applications and registers the Services entry
+```
+
 ---
 
 ## Auto-update workflows
@@ -50,6 +59,7 @@ All packages are kept current by GitHub Actions workflows that run daily at 06:0
 |---|---|---|
 | `update-pi.yml` | `earendil-works/pi` GitHub releases | `Casks/pi.rb` version + arch SHA256s |
 | `update-phi.yml` | `SingularityCoding/phi` `pyproject.toml` version on `main` | `Formula/phi.rb` commit SHA + version |
+| `update-foks-tts.yml` | `soulhakr/foks-tts` GitHub releases | `Formula/foks-tts.rb` version + SHA256 of the release tarball |
 | `update-purr.yml` | `iamarunbrahma/purr` GitHub releases | `Casks/purr.rb` version + SHA256 |
 
 Workflows can also be triggered manually from the [Actions tab](https://github.com/soulhakr/homebrew-tap/actions).
