@@ -1,6 +1,6 @@
 cask "purr" do
-  version "0.0.1"
-  sha256 "147c0df5f48ec03c692c4d060d0ec215c094f2466c7c836eec423e92d52653b2"
+  version "0.0.2"
+  sha256 "d5dbd226340c219818a27ca2a5e434da3d5a3ebf5474895aaa08e2941bd59f55"
 
   url "https://github.com/iamarunbrahma/purr/releases/download/v#{version}/Purr.dmg"
   name "Purr"
